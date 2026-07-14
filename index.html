@@ -256,7 +256,7 @@
                 <div id="qrcode"></div>
             </div>
 
-            <p style="text-align: center; font-weight: bold; margin-bottom: 5px;">Amount: ₹5,000</p>
+            <p style="text-align: center; font-weight: bold; margin-bottom: 5px;">Amount: ₹100</p>
             <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">
                 GPay / PhonePe / Paytm / BHIM
             </p>
@@ -269,10 +269,12 @@
             <h2>🎉 Registration Success!</h2>
             <p class="subtitle">Your entry is submitted. It will show up after admin approval.</p>
             
-            <a href="https://chat.whatsapp.com/your-community-link" target="_blank" class="social-btn community-btn">
-                💬 Join WhatsApp Community
+            <!-- WhatsApp Channel Link -->
+            <a href="https://whatsapp.com/channel/0029Vb87brVFMqrd90CZWD2b" target="_blank" class="social-btn community-btn">
+                💬 Join WhatsApp Channel
             </a>
-            <a href="https://instagram.com/your-instagram-username" target="_blank" class="social-btn instagram-btn">
+            <!-- Instagram Link -->
+            <a href="https://www.instagram.com/tournament_playzzz?igsh=MjkyazlkN2Ruemhp" target="_blank" class="social-btn instagram-btn">
                 📸 Follow us on Instagram
             </a>
 
@@ -311,17 +313,16 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Temporary database using browser storage
         let registrations = JSON.parse(localStorage.getItem('tournament_teams')) || [];
 
-        // Simple Login Rule: regular credentials pass to step 2. 
-        // If they enter username 'admin' and pass 'admin123', goes to Admin Panel.
+        // Admin Credentials Authentication
         function handleLogin(event) {
             event.preventDefault();
             const id = document.getElementById("login-id").value;
             const pass = document.getElementById("login-password").value;
 
-            if(id === "admin" && pass === "admin123") {
+            // Updated Admin Password Check
+            if(id === "admin" && pass === "1230984567") {
                 openAdminPanel();
             } else {
                 goToStep(2);
@@ -359,9 +360,9 @@
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = ""; 
 
-            const upiId = "yourname@okaxis"; // ⚠️ Change this to your real UPI ID
+            const upiId = "yourname@okaxis"; // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR UPI ID
             const payeeName = "Tournament Playz";
-            const amount = "5000";
+            const amount = "100"; // Entry fee updated to 100 Rs
             const teamName = document.getElementById("team-name").value || "Team";
             const transactionNote = `Entry Fee for ${teamName}`;
 
@@ -377,7 +378,6 @@
             });
         }
 
-        // Save submitted registration form data
         function submitRegistrationData() {
             const newTeam = {
                 id: Date.now(),
