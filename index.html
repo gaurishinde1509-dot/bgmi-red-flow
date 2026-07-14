@@ -3,72 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Playz Registration</title>
-    <!-- QR Code Library for Payment Page -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Tournament Registration - Playz System</title>
     <style>
         :root {
-            --primary-color: #7c3aed; /* Purple theme */
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --text-muted: #94a3b8;
-            --success-color: #10b981;
+            --primary-color: #4CAF50;
+            --dark-color: #1a1a1a;
+            --light-color: #ffffff;
+            --grey-color: #f4f4f4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
+            background-color: var(--dark-color);
+            color: var(--light-color);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
         }
 
         .container {
-            background-color: var(--card-bg);
+            background-color: #2a2a2a;
+            width: 100%;
+            max-width: 600px;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 500px;
-            box-sizing: border-box;
-            transition: max-width 0.3s ease;
-        }
-
-        /* Expand container for Admin view */
-        .container.admin-mode {
-            max-width: 800px;
-        }
-
-        /* Step/Page Wrapper */
-        .step {
-            display: none;
-        }
-
-        .step.active {
-            display: block;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid #3a3a3a;
         }
 
         h2 {
-            margin-top: 0;
-            color: var(--text-color);
             text-align: center;
-            font-size: 24px;
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: var(--text-muted);
             margin-bottom: 25px;
-            font-size: 14px;
+            color: var(--primary-color);
+            font-size: 28px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
         }
 
         label {
@@ -76,441 +57,236 @@
             margin-bottom: 8px;
             font-weight: 600;
             font-size: 14px;
+            color: #ccc;
         }
 
-        input {
+        input[type="text"],
+        input[type="tel"],
+        textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #475569;
-            background-color: #0f172a;
-            color: white;
+            border: 2px solid #444;
             border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 15px;
+            background-color: #1f1f1f;
+            color: #fff;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
 
-        input:focus {
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary-color);
         }
 
-        button {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* Payment Section (Scanner removed, phone payment added) */
+        .payment-section {
+            background-color: #1f1f1f;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed #444;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .payment-section h3 {
+            color: var(--light-color);
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .payment-phone {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 15px 0;
+            letter-spacing: 1.5px;
+            display: inline-block;
+            background: #2a2a2a;
+            padding: 8px 18px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .payment-instructions {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 15px;
+        }
+
+        .file-upload-input {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #ccc;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
             background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
+            font-size: 18px;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background-color 0.3s, transform 0.1s;
         }
 
-        button:hover {
-            background-color: #6d28d9;
+        .submit-btn:hover {
+            background-color: #45a049;
         }
 
-        .qr-container {
-            display: flex;
-            justify-content: center;
-            margin: 20px 0;
+        .submit-btn:active {
+            transform: scale(0.98);
         }
 
-        .social-btn {
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            color: white;
-        }
-
-        .instagram-btn {
-            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-        }
-
-        .community-btn {
-            background-color: #25D366;
-        }
-
-        /* Admin Dashboard Styles */
-        .admin-table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .status-message {
             margin-top: 15px;
-            font-size: 14px;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #475569;
-        }
-
-        th {
-            background-color: #0f172a;
-            color: var(--text-muted);
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .badge-pending { background-color: #eab308; color: #000; }
-        .badge-approved { background-color: var(--success-color); color: #fff; }
-
-        .admin-actions {
-            display: flex;
-            gap: 5px;
-        }
-
-        .action-btn {
-            padding: 4px 8px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            color: white;
-        }
-
-        .approve-btn { background-color: var(--success-color); }
-        .delete-btn { background-color: #ef4444; }
-
-        .admin-nav {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .admin-link {
-            font-size: 12px;
-            color: var(--text-muted);
-            cursor: pointer;
             text-align: center;
-            margin-top: 15px;
-            text-decoration: underline;
+            font-weight: 600;
+            display: none;
+        }
+
+        .status-success {
+            color: #4CAF50;
+        }
+
+        .status-error {
+            color: #f44336;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="main-container">
-
-        <!-- ================= PAGE 1: LOGIN ================= -->
-        <div id="step-1" class="step active">
-            <h2>Welcome to Tournament Playz</h2>
-            <p class="subtitle">Please enter your login details to continue</p>
-            <form onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label>Email / Phone Number</label>
-                    <input type="text" id="login-id" placeholder="Enter email or phone or 'admin'" required>
-                </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="login-password" placeholder="••••••••" required>
-                </div>
-                <button type="submit">Login</button>
-            </form>
-            <div class="admin-link" onclick="promptAdminLogin()">💡 Access Admin Panel</div>
-        </div>
-
-        <!-- ================= PAGE 2: SQUAD DETAILS ================= -->
-        <div id="step-2" class="step">
-            <h2>Squad Registration</h2>
-            <p class="subtitle">Fill in your team details correctly</p>
-            <form onsubmit="nextStep(event, 3)">
-                <div class="form-group">
-                    <label>Team Name</label>
-                    <input type="text" id="team-name" placeholder="e.g., Soul Triggers" required>
-                </div>
-                <div class="form-group">
-                    <label>Players Names (Comma separated)</label>
-                    <input type="text" id="players" placeholder="e.g., Mortal, Scout, Jonathan, Clutchgod" required>
-                </div>
-                <div class="form-group">
-                    <label>WhatsApp / Contact No.</label>
-                    <input type="tel" id="whatsapp" placeholder="e.g., +91 98765 43210" required>
-                </div>
-                <button type="submit">Proceed to Payment</button>
-            </form>
-        </div>
-
-        <!-- ================= PAGE 3: PAYMENT ================= -->
-        <div id="step-3" class="step">
-            <h2>🏆 Entry Fee Payment</h2>
-            <p class="subtitle">Scan this QR code with any UPI app to pay entry fee</p>
-            
-            <div class="qr-container">
-                <div id="qrcode"></div>
-            </div>
-
-            <p style="text-align: center; font-weight: bold; margin-bottom: 5px;">Amount: ₹100</p>
-            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">
-                GPay / PhonePe / Paytm / BHIM
-            </p>
-
-            <button onclick="submitRegistrationData()">Done? Verify & Finish</button>
-        </div>
-
-        <!-- ================= PAGE 4: SUCCESS & SOCIALS ================= -->
-        <div id="step-4" class="step">
-            <h2>🎉 Registration Success!</h2>
-            <p class="subtitle">Your entry is submitted. It will show up after admin approval.</p>
-            
-            <!-- WhatsApp Channel Link -->
-            <a href="https://whatsapp.com/channel/0029Vb87brVFMqrd90CZWD2b" target="_blank" class="social-btn community-btn">
-                💬 Join WhatsApp Channel
-            </a>
-            <!-- Instagram Link -->
-            <a href="https://www.instagram.com/tournament_playzzz?igsh=MjkyazlkN2Ruemhp" target="_blank" class="social-btn instagram-btn">
-                📸 Follow us on Instagram
-            </a>
-
-            <button onclick="restartRegistration()" style="background-color: #475569; margin-top: 20px;">
-                Register Another Team
-            </button>
-        </div>
-
-        <!-- ================= PAGE 5: ADMIN DASHBOARD ================= -->
-        <div id="step-admin" class="step">
-            <div class="admin-nav">
-                <h2>🛠️ Admin Panel</h2>
-                <button onclick="logoutAdmin()" style="width: auto; margin-top: 0; padding: 6px 12px; background-color: #ef4444;">Logout</button>
-            </div>
-            <p class="subtitle">Manage registrations and check payment confirmations</p>
-            
-            <div class="admin-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Team Name</th>
-                            <th>Players</th>
-                            <th>WhatsApp</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-table-body">
-                        <!-- Dynamic rows will go here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- JavaScript Logic -->
-    <script>
-        let registrations = JSON.parse(localStorage.getItem('tournament_teams')) || [];
-
-        // Admin Credentials Authentication
-        function handleLogin(event) {
-            event.preventDefault();
-            const id = document.getElementById("login-id").value;
-            const pass = document.getElementById("login-password").value;
-
-            // Updated Admin Password Check
-            if(id === "admin" && pass === "1230984567") {
-                openAdminPanel();
-            } else {
-                goToStep(2);
-            }
-        }
-
-        function promptAdminLogin() {
-            document.getElementById("login-id").value = "admin";
-            document.getElementById("login-password").value = "";
-            document.getElementById("login-password").focus();
-        }
-
-        function nextStep(event, nextStepNum) {
-            event.preventDefault();
-            goToStep(nextStepNum);
-
-            if (nextStepNum === 3) {
-                generatePaymentQR();
-            }
-        }
-
-        function goToStep(stepNum) {
-            document.getElementById("main-container").classList.remove("admin-mode");
-            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
-            
-            if(stepNum === 'admin') {
-                document.getElementById("main-container").classList.add("admin-mode");
-                document.getElementById("step-admin").classList.add('active');
-            } else {
-                document.getElementById(`step-${stepNum}`).classList.add('active');
-            }
-        }
-
-        function generatePaymentQR() {
-            const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = ""; 
-
-            const upiId = "8999849027@ipb"; // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR UPI ID
-            const payeeName = "Tournament Playz";
-            const amount = "100"; // Entry fee updated to 100 Rs
-            const teamName = document.getElementById("team-name").value || "Team";
-            const transactionNote = `Entry Fee for ${teamName}`;
-
-            const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
-
-            new QRCode(qrContainer, {
-                text: upiLink,
-                width: 200,
-                height: 200,
-                colorDark : "#ffffff",
-                colorLight : "#1e293b",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-        }
-
-        function submitRegistrationData() {
-            const newTeam = {
-                id: Date.now(),
-                teamName: document.getElementById("team-name").value,
-                players: document.getElementById("players").value,
-                whatsapp: document.getElementById("whatsapp").value,
-                status: 'Pending'
-            };
-
-            registrations.push(newTeam);
-            localStorage.setItem('tournament_teams', JSON.stringify(registrations));
-            goToStep(4);
-        }
-
-        /* --- Admin Panel Logic --- */
-        function openAdminPanel() {
-            goToStep('admin');
-            renderAdminTable();
-        }
-
-        function renderAdminTable() {
-            const tbody = document.getElementById("admin-table-body");
-            tbody.innerHTML = "";
-
-            if(registrations.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No squads registered yet.</td></tr>`;
-                return;
-            }
-
-            registrations.forEach(team => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td><strong>${team.teamName}</strong></td>
-                    <td>${team.players}</td>
-                    <td>${team.whatsapp}</td>
-                    <td><span class="badge ${team.status === 'Approved' ? 'badge-approved' : 'badge-pending'}">${team.status}</span></td>
-                    <td class="admin-actions">
-                        ${team.status === 'Pending' ? `<button class="action-btn approve-btn" onclick="approveTeam(${team.id})">Approve</button>` : ''}
-                        <button class="action-btn delete-btn" onclick="deleteTeam(${team.id})">Remove</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function approveTeam(id) {
-            registrations = registrations.map(team => team.id === id ? {...team, status: 'Approved'} : team);
-            localStorage.setItem('tournament_teams', JSON.stringify(registrations));
-            renderAdminTable();
-        }
-
-        function deleteTeam(id) {
-            if(confirm("Are you sure you want to remove this registration?")) {
-                registrations = registrations.filter(team => team.id !== id);
-                localStorage.setItem('tournament_teams', JSON.stringify(registrations));
-                renderAdminTable();
-            }
-        }
-
-        function logoutAdmin() {
-            goToStep(1);
-            document.getElementById("login-id").value = "";
-            document.getElementById("login-password").value = "";
-        }
-
-        function restartRegistration() {
-            document.getElementById("login-id").value = "";
-            document.getElementById("login-password").value = "";
-            document.getElementById("team-name").value = "";
-            document.getElementById("players").value = "";
-            document.getElementById("whatsapp").value = "";
-            goToStep(1);
-        }
-        // Send email notification using Formspree (No login/account needed!)
-function sendEmailNotification(teamName, players, whatsapp) {
-    const targetEmail = "roshukadam2218@gmail.com";
+<div class="container">
+    <h2>Tournament Registration</h2>
     
-    // Formspree API endpoint configured for your target email
-    const formspreeUrl = `https://formspree.io/f/${targetEmail}`; 
+    <form id="registrationForm">
+        <!-- Team Name -->
+        <div class="form-group">
+            <label for="teamName">Team Name</label>
+            <input type="text" id="teamName" placeholder="Enter your team's name" required>
+        </div>
 
-    const formData = {
-        subject: `🏆 New Team Registered: ${teamName}`,
-        _replyto: "no-reply@tournamentplayz.com",
-        "Team Name": teamName,
-        "Players": players,
-        "WhatsApp Link": whatsapp
-    };
+        <!-- Players List -->
+        <div class="form-group">
+            <label for="players">Player Names / IGNs (comma-separated)</label>
+            <textarea id="players" placeholder="Example: Player1, Player2, Player3, Player4" required></textarea>
+        </div>
 
-    fetch(formspreeUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log("Notification email successfully routed!");
-        } else {
-            console.error("Formspree route failed.");
-        }
-    })
-    .catch(error => {
-        console.error("Error connecting to Formspree:", error);
+        <!-- Contact/WhatsApp -->
+        <div class="form-group">
+            <label for="whatsapp">WhatsApp Phone Number</label>
+            <input type="tel" id="whatsapp" placeholder="Enter active WhatsApp number" required>
+        </div>
+
+        <!-- Payment Details Section -->
+        <div class="payment-section">
+            <h3>Payment Instructions</h3>
+            <p class="payment-instructions">Pay your registration fee using GPay, PhonePe, or Paytm to this number:</p>
+            
+            <div class="payment-phone">
+                📞 8999849027
+            </div>
+            
+            <div class="form-group" style="text-align: left; margin-bottom: 0;">
+                <label for="screenshot">Upload Payment Screenshot</label>
+                <input type="file" id="screenshot" class="file-upload-input" accept="image/*" required>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
+        
+        <!-- Status Notification -->
+        <div id="statusMsg" class="status-message"></div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('statusMsg');
+        
+        const teamName = document.getElementById('teamName').value;
+        const players = document.getElementById('players').value;
+        const whatsapp = document.getElementById('whatsapp').value;
+
+        // Visual loading state
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+        statusMsg.style.display = "none";
+
+        // Trigger the Email notification through Formspree
+        sendEmailNotification(teamName, players, whatsapp, submitBtn, statusMsg);
     });
-}
-        subject: `🏆 New Team Registered: ${teamName}`,
-        _replyto: "no-reply@tournamentplayz.com",
-        "Team Name": teamName,
-        "Players": players,
-        "WhatsApp Link": whatsapp
-    };
 
-    fetch(formspreeUrl, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json"
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => {
-        if (response.ok) {
-            console.log("Notification email successfully routed!");
-        } else {
-            console.error("Formspree route failed.");
-        }
-    })
-    .catch(error => {
-        console.error("Error connecting to Formspree:", error);
-    });
-}
-    </script>
+    // Send email notification using Formspree
+    function sendEmailNotification(teamName, players, whatsapp, submitBtn, statusMsg) {
+        const targetEmail = "roshukadam2218@gmail.com";
+        const formspreeUrl = `https://formspree.io/f/${targetEmail}`; 
+
+        const formData = {
+            subject: `🏆 New Team Registered: ${teamName}`,
+            _replyto: "no-reply@tournamentplayz.com",
+            "Team Name": teamName,
+            "Players": players,
+            "WhatsApp Link": whatsapp
+        };
+
+        fetch(formspreeUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Registration";
+            
+            if (response.ok) {
+                statusMsg.className = "status-message status-success";
+                statusMsg.innerText = "Registration complete! Check your email for verification.";
+                statusMsg.style.display = "block";
+                document.getElementById('registrationForm').reset();
+            } else {
+                statusMsg.className = "status-message status-error";
+                statusMsg.innerText = "Registration failed. Please try again.";
+                statusMsg.style.display = "block";
+            }
+        })
+        .catch(error => {
+            console.error("Error connecting to Formspree:", error);
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Registration";
+            statusMsg.className = "status-message status-error";
+            statusMsg.innerText = "Error sending request. Check your connection.";
+            statusMsg.style.display = "block";
+        });
+    }
+</script>
+
 </body>
 </html>
