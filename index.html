@@ -385,7 +385,7 @@
         updateProgressBar();
     }
 
-    // Handle form submit via Web3Forms Public Submission engine
+    // Handle form submit via Web3Forms API with the Access Key
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -396,20 +396,26 @@
         const teamName = document.getElementById('teamName').value;
         const players = document.getElementById('players').value;
         const whatsapp = document.getElementById('whatsapp').value;
+        const screenshotFile = document.getElementById('screenshot').files[0];
 
         submitBtn.disabled = true;
         backBtnFinal.disabled = true;
         submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // Using Web3Forms public forwarding endpoint to direct target email cleanly
+        // Using your active Web3Forms Access Key
         const formData = new FormData();
-        formData.append("to", "roshukadam2218@gmail.com");
+        formData.append("access_key", "3588aa9b-cc49-485c-ad60-ebb0485e0182");
         formData.append("subject", `🏆 New Team Registered: ${teamName}`);
-        formData.append("from_name", "Tournament Playz System");
+        formData.append("from_name", "Tournament Playz");
         formData.append("Team Name", teamName);
         formData.append("Players", players);
         formData.append("WhatsApp Link", whatsapp);
+        
+        // Append screenshot file if it exists
+        if (screenshotFile) {
+            formData.append("Payment Screenshot", screenshotFile);
+        }
 
         fetch("https://api.web3forms.com/submit", {
             method: "POST",
