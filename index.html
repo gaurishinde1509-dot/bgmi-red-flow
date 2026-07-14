@@ -340,6 +340,7 @@
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
     const progressLineFill = document.getElementById('progressLineFill');
+    let base64ImageString = ""; // Stores converted image data
 
     function updateProgressBar() {
         stepCircles.forEach((circle, index) => {
@@ -385,7 +386,26 @@
         updateProgressBar();
     }
 
-    // Handle form submit via Web3Forms API with the Access Key
+    // Convert selected image to Base64 instantly
+    document.getElementById('screenshot').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Check file size (keep it small to prevent submission errors, ideally under 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                alert("The image is too large. Please select a smaller screenshot under 2MB.");
+                this.value = "";
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                base64ImageString = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Handle form submit via Web3Forms API 
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -396,30 +416,30 @@
         const teamName = document.getElementById('teamName').value;
         const players = document.getElementById('players').value;
         const whatsapp = document.getElementById('whatsapp').value;
-        const screenshotFile = document.getElementById('screenshot').files[0];
 
         submitBtn.disabled = true;
         backBtnFinal.disabled = true;
         submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // Using your active Web3Forms Access Key
-        const formData = new FormData();
-        formData.append("access_key", "3588aa9b-cc49-485c-ad60-ebb0485e0182");
-        formData.append("subject", `🏆 New Team Registered: ${teamName}`);
-        formData.append("from_name", "Tournament Playz");
-        formData.append("Team Name", teamName);
-        formData.append("Players", players);
-        formData.append("WhatsApp Link", whatsapp);
-        
-        // Append screenshot file if it exists
-        if (screenshotFile) {
-            formData.append("Payment Screenshot", screenshotFile);
-        }
+        // JSON payload bypasses file validation and handles the base64 cleanly!
+        const payload = {
+            access_key: "3588aa9b-cc49-485c-ad60-ebb0485e0182",
+            subject: `🏆 New Team Registered: ${teamName}`,
+            from_name: "Tournament Playz",
+            "Team Name": teamName,
+            "Players": players,
+            "WhatsApp Link": whatsapp,
+            "Payment Screenshot (Base64)": base64ImageString || "No Image Uploaded"
+        };
 
         fetch("https://api.web3forms.com/submit", {
             method: "POST",
-            body: formData
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
         })
         .then(response => response.json())
         .then(data => {
@@ -432,6 +452,7 @@
                 statusMsg.innerText = "Registration completed successfully!";
                 statusMsg.style.display = "block";
                 document.getElementById('registrationForm').reset();
+                base64ImageString = ""; // Reset image container
                 
                 // Return to Page 1 cleanly
                 document.getElementById(`step-${currentStep}`).classList.remove('active');
