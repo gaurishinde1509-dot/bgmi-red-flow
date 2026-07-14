@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Playz Registration</title>
+    <!-- QR Code Library for Payment Page -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #7c3aed; /* Purple theme like your original site */
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            box-sizing: border-box;
+        }
+
+        /* Step/Page Wrapper */
+        .step {
+            display: none; /* Hidden by default */
+        }
+
+        .step.active {
+            display: block; /* Show active page */
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--text-color);
+            text-align: center;
+            font-size: 24px;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #475569;
+            background-color: #0f172a;
+            color: white;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #6d28d9;
+        }
+
+        /* Payment QR center styling */
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        /* Social Link Buttons */
+        .social-btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .instagram-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .community-btn {
+            background-color: #25D366; /* WhatsApp Green */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <!-- ================= PAGE 1: LOGIN ================= -->
+        <div id="step-1" class="step active">
+            <h2>Welcome to Playz</h2>
+            <p class="subtitle">Please enter your login details to continue</p>
+            <form onsubmit="nextStep(event, 2)">
+                <div class="form-group">
+                    <label>Email / Phone Number</label>
+                    <input type="text" id="login-id" placeholder="Enter email or phone" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- ================= PAGE 2: TEAM & PLAYERS DETAIL ================= -->
+        <div id="step-2" class="step">
+            <h2>Squad Registration</h2>
+            <p class="subtitle">Fill in your team details correctly</p>
+            <form onsubmit="nextStep(event, 3)">
+                <div class="form-group">
+                    <label>Team Name</label>
+                    <input type="text" id="team-name" placeholder="e.g., Soul Triggers" required>
+                </div>
+                <div class="form-group">
+                    <label>Players Names (Comma separated)</label>
+                    <input type="text" id="players" placeholder="e.g., Mortal, Scout, Jonathan, Clutchgod" required>
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp / Contact No.</label>
+                    <input type="tel" id="whatsapp" placeholder="e.g., +91 98765 43210" required>
+                </div>
+                <button type="submit">Proceed to Payment</button>
+            </form>
+        </div>
+
+        <!-- ================= PAGE 3: PAYMENT ================= -->
+        <div id="step-3" class="step">
+            <h2>🏆 Entry Fee Payment</h2>
+            <p class="subtitle">Scan this QR code with any UPI app to pay entry fee</p>
+            
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
+
+            <p style="text-align: center; font-weight: bold; margin-bottom: 5px;">Amount: ₹5,000</p>
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">
+                GPay / PhonePe / Paytm / BHIM
+            </p>
+
+            <button onclick="goToStep(4)">Done? Verify & Finish</button>
+        </div>
+
+        <!-- ================= PAGE 4: SOCIALS & LINKS ================= -->
+        <div id="step-4" class="step">
+            <h2>🎉 Registration Success!</h2>
+            <p class="subtitle">You have successfully registered. Join our groups now!</p>
+            
+            <!-- Replace these '#' links with your actual URLs -->
+            <a href="https://chat.whatsapp.com/your-community-link" target="_blank" class="social-btn community-btn">
+                💬 Join WhatsApp Community
+            </a>
+            <a href="https://instagram.com/your-instagram-username" target="_blank" class="social-btn instagram-btn">
+                📸 Follow us on Instagram
+            </a>
+
+            <button onclick="restartRegistration()" style="background-color: #475569; margin-top: 20px;">
+                Register Another Team
+            </button>
+        </div>
+
+    </div>
+
+    <!-- JavaScript to Handle Step Switching and UPI Generation -->
+    <script>
+        // Transition to next page
+        function nextStep(event, nextStepNum) {
+            event.preventDefault(); // Stop form submission reloading
+            goToStep(nextStepNum);
+
+            // If moving to step 3 (Payment), generate the dynamic QR
+            if (nextStepNum === 3) {
+                generatePaymentQR();
+            }
+        }
+
+        // Switch visible wrapper
+        function goToStep(stepNum) {
+            // Hide all steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            // Show requested step
+            document.getElementById(`step-${stepNum}`).classList.add('active');
+        }
+
+        // Generate customized UPI QR Code
+        function generatePaymentQR() {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = ""; // Clear existing QR code if any
+
+            const upiId = "yourname@okaxis";  // ⚠️ Change to your UPI ID
+            const payeeName = "Tournament Playz";
+            const amount = "5000";
+            const teamName = document.getElementById("team-name").value || "Team";
+            const transactionNote = `Entry Fee for ${teamName}`;
+
+            // NPCI Official UPI Deep Link
+            const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
+
+            // Build QR code inside placeholder
+            new QRCode(qrContainer, {
+                text: upiLink,
+                width: 200,
+                height: 200,
+                colorDark : "#ffffff", // Light QR code color on dark background
+                colorLight : "#1e293b", // Matching card-bg
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        // Reset to Login (Page 1)
+        function restartRegistration() {
+            document.getElementById("login-id").value = "";
+            document.getElementById("login-password").value = "";
+            document.getElementById("team-name").value = "";
+            document.getElementById("players").value = "";
+            document.getElementById("whatsapp").value = "";
+            goToStep(1);
+        }
+    </script>
+</body>
+</html>
