@@ -354,13 +354,11 @@
             }
         });
         
-        // Progress bar percentage calculation
         const progressPercentage = ((currentStep - 1) / (stepCircles.length - 1)) * 100;
         progressLineFill.style.width = `${progressPercentage}%`;
     }
 
     function nextStep(stepNumber) {
-        // Simple client-side validation check before proceeding
         if (stepNumber === 1 && !document.getElementById('teamName').value.trim()) {
             alert("Please enter your Team Name first.");
             return;
@@ -387,7 +385,7 @@
         updateProgressBar();
     }
 
-    // Handle form submit
+    // Handle form submit via Web3Forms Public Submission engine
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -399,68 +397,57 @@
         const players = document.getElementById('players').value;
         const whatsapp = document.getElementById('whatsapp').value;
 
-        // Disable UI during transmission
         submitBtn.disabled = true;
         backBtnFinal.disabled = true;
         submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // Call Formspree 
-        sendEmailNotification(teamName, players, whatsapp, submitBtn, backBtnFinal, statusMsg);
-    });
+        // Using Web3Forms public forwarding endpoint to direct target email cleanly
+        const formData = new FormData();
+        formData.append("to", "roshukadam2218@gmail.com");
+        formData.append("subject", `🏆 New Team Registered: ${teamName}`);
+        formData.append("from_name", "Tournament Playz System");
+        formData.append("Team Name", teamName);
+        formData.append("Players", players);
+        formData.append("WhatsApp Link", whatsapp);
 
-    function sendEmailNotification(teamName, players, whatsapp, submitBtn, backBtnFinal, statusMsg) {
-        const targetEmail = "roshukadam2218@gmail.com";
-        const formspreeUrl = `https://formspree.io/f/${targetEmail}`; 
-
-        const formData = {
-            subject: `🏆 New Team Registered: ${teamName}`,
-            _replyto: "no-reply@tournamentplayz.com",
-            "Team Name": teamName,
-            "Players": players,
-            "WhatsApp Link": whatsapp
-        };
-
-        fetch(formspreeUrl, {
+        fetch("https://api.web3forms.com/submit", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json"
-            },
-            body: JSON.stringify(formData)
+            body: formData
         })
-        .then(response => {
+        .then(response => response.json())
+        .then(data => {
             submitBtn.disabled = false;
             backBtnFinal.disabled = false;
             submitBtn.innerText = "Submit";
             
-            if (response.ok) {
+            if (data.success) {
                 statusMsg.className = "status-message status-success";
-                statusMsg.innerText = "Registration complete! Check your email for verification.";
+                statusMsg.innerText = "Registration completed successfully!";
                 statusMsg.style.display = "block";
                 document.getElementById('registrationForm').reset();
                 
-                // Go back to step 1
+                // Return to Page 1 cleanly
                 document.getElementById(`step-${currentStep}`).classList.remove('active');
                 currentStep = 1;
                 document.getElementById(`step-1`).classList.add('active');
                 updateProgressBar();
             } else {
                 statusMsg.className = "status-message status-error";
-                statusMsg.innerText = "Registration failed. Please try again.";
+                statusMsg.innerText = "Registration failed: " + data.message;
                 statusMsg.style.display = "block";
             }
         })
         .catch(error => {
-            console.error("Error connecting to Formspree:", error);
+            console.error("Submission error:", error);
             submitBtn.disabled = false;
             backBtnFinal.disabled = false;
             submitBtn.innerText = "Submit";
             statusMsg.className = "status-message status-error";
-            statusMsg.innerText = "Error sending request. Check your connection.";
+            statusMsg.innerText = "Error sending details. Please try again.";
             statusMsg.style.display = "block";
         });
-    }
+    });
 </script>
 
 </body>
