@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tournament Registration - Playz System</title>
+    <title>Tournament Registration</title>
     <style>
         :root {
-            --primary-color: #4CAF50;
-            --dark-color: #1a1a1a;
-            --light-color: #ffffff;
-            --grey-color: #f4f4f4;
+            --primary-color: #4CAF50; /* BGMI Green */
+            --dark-bg: #121212;
+            --card-bg: #1a1a1a;
+            --input-bg: #222222;
+            --border-color: #333333;
+            --text-color: #ffffff;
+            --muted-text: #888888;
         }
 
         * {
@@ -20,8 +23,8 @@
         }
 
         body {
-            background-color: var(--dark-color);
-            color: var(--light-color);
+            background-color: var(--dark-bg);
+            color: var(--text-color);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,22 +33,97 @@
         }
 
         .container {
-            background-color: #2a2a2a;
+            background-color: var(--card-bg);
             width: 100%;
-            max-width: 600px;
+            max-width: 550px;
             padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            border: 1px solid #3a3a3a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            background-color: var(--border-color);
+            width: 100%;
+            z-index: 1;
+        }
+
+        .progress-line-fill {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 4px;
+            background-color: var(--primary-color);
+            width: 0%;
+            z-index: 2;
+            transition: width 0.3s ease;
+        }
+
+        .step-circle {
+            width: 35px;
+            height: 35px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            z-index: 3;
+            transition: all 0.3s ease;
+            color: var(--muted-text);
+        }
+
+        .step-circle.active {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background-color: var(--dark-bg);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .step-circle.completed {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
         }
 
         h2 {
             text-align: center;
             margin-bottom: 25px;
             color: var(--primary-color);
-            font-size: 28px;
+            font-size: 24px;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+        }
+
+        /* Form Steps (hidden by default) */
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .form-group {
@@ -54,21 +132,21 @@
 
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            font-size: 14px;
-            color: #ccc;
+            font-size: 15px;
+            color: var(--text-color);
         }
 
         input[type="text"],
         input[type="tel"],
         textarea {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background-color: #1f1f1f;
-            color: #fff;
+            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
             font-size: 16px;
             transition: border-color 0.3s;
         }
@@ -82,80 +160,92 @@
 
         textarea {
             resize: vertical;
-            min-height: 80px;
+            min-height: 100px;
         }
 
-        /* Payment Section (Scanner removed, phone payment added) */
-        .payment-section {
-            background-color: #1f1f1f;
+        /* Payment Step Styling */
+        .payment-box {
+            background-color: var(--input-bg);
             padding: 20px;
             border-radius: 8px;
-            border: 2px dashed #444;
+            border: 1px dashed var(--border-color);
             text-align: center;
-            margin: 25px 0;
+            margin-bottom: 20px;
         }
 
-        .payment-section h3 {
-            color: var(--light-color);
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .payment-phone {
-            font-size: 26px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin: 15px 0;
-            letter-spacing: 1.5px;
-            display: inline-block;
-            background: #2a2a2a;
-            padding: 8px 18px;
-            border-radius: 6px;
-            border: 1px solid #333;
-        }
-
-        .payment-instructions {
-            font-size: 13px;
-            color: #aaa;
+        .payment-box p {
+            font-size: 14px;
+            color: #ccc;
             line-height: 1.5;
         }
 
-        .file-upload-wrapper {
-            position: relative;
-            margin-top: 15px;
+        .phone-number-badge {
+            display: inline-block;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            background-color: var(--dark-bg);
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+            border: 1px solid var(--border-color);
+            letter-spacing: 1px;
         }
 
         .file-upload-input {
             width: 100%;
-            padding: 10px;
-            background: #2a2a2a;
-            border: 1px solid #444;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
             color: #ccc;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
         }
 
-        .submit-btn {
-            width: 100%;
+        /* Buttons Grid */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            flex: 1;
             padding: 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 18px;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             text-transform: uppercase;
             letter-spacing: 1px;
-            transition: background-color 0.3s, transform 0.1s;
+            border: none;
+            transition: all 0.2s ease;
         }
 
-        .submit-btn:hover {
+        .btn-next, .btn-submit {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
             background-color: #45a049;
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
-        .submit-btn:active {
-            transform: scale(0.98);
+        .btn-back {
+            background-color: #333333;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #444444;
+        }
+
+        .btn:disabled {
+            background-color: #555555;
+            color: #888888;
+            cursor: not-allowed;
+            box-shadow: none;
         }
 
         .status-message {
@@ -165,84 +255,161 @@
             display: none;
         }
 
-        .status-success {
-            color: #4CAF50;
-        }
-
-        .status-error {
-            color: #f44336;
-        }
+        .status-success { color: #4CAF50; }
+        .status-error { color: #f44336; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2>Tournament Registration</h2>
+
+    <!-- Step Progress Indicator -->
+    <div class="progress-container">
+        <div class="progress-line"></div>
+        <div class="progress-line-fill" id="progressLineFill"></div>
+        <div class="step-circle active">1</div>
+        <div class="step-circle">2</div>
+        <div class="step-circle">3</div>
+        <div class="step-circle">4</div>
+    </div>
     
     <form id="registrationForm">
-        <!-- Team Name -->
-        <div class="form-group">
-            <label for="teamName">Team Name</label>
-            <input type="text" id="teamName" placeholder="Enter your team's name" required>
-        </div>
-
-        <!-- Players List -->
-        <div class="form-group">
-            <label for="players">Player Names / IGNs (comma-separated)</label>
-            <textarea id="players" placeholder="Example: Player1, Player2, Player3, Player4" required></textarea>
-        </div>
-
-        <!-- Contact/WhatsApp -->
-        <div class="form-group">
-            <label for="whatsapp">WhatsApp Phone Number</label>
-            <input type="tel" id="whatsapp" placeholder="Enter active WhatsApp number" required>
-        </div>
-
-        <!-- Payment Details Section -->
-        <div class="payment-section">
-            <h3>Payment Instructions</h3>
-            <p class="payment-instructions">Pay your registration fee using GPay, PhonePe, or Paytm to this number:</p>
-            
-            <div class="payment-phone">
-                📞 8999849027
+        <!-- PAGE 1: Team Name -->
+        <div class="form-step active" id="step-1">
+            <div class="form-group">
+                <label for="teamName">Team Name</label>
+                <input type="text" id="teamName" placeholder="Enter your team's name" required>
             </div>
-            
-            <div class="form-group" style="text-align: left; margin-bottom: 0;">
-                <label for="screenshot">Upload Payment Screenshot</label>
-                <input type="file" id="screenshot" class="file-upload-input" accept="image/*" required>
+            <div class="btn-group">
+                <button type="button" class="btn btn-next" onclick="nextStep(1)">Next</button>
             </div>
         </div>
 
-        <!-- Submit Button -->
-        <button type="submit" class="submit-btn" id="submitBtn">Submit Registration</button>
-        
-        <!-- Status Notification -->
+        <!-- PAGE 2: Player Names -->
+        <div class="form-step" id="step-2">
+            <div class="form-group">
+                <label for="players">Player Names / IGNs (comma-separated)</label>
+                <textarea id="players" placeholder="Example: Player1, Player2, Player3, Player4" required></textarea>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-back" onclick="prevStep(2)">Back</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(2)">Next</button>
+            </div>
+        </div>
+
+        <!-- PAGE 3: WhatsApp Number -->
+        <div class="form-step" id="step-3">
+            <div class="form-group">
+                <label for="whatsapp">WhatsApp Phone Number</label>
+                <input type="tel" id="whatsapp" placeholder="Enter active WhatsApp number" required>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-back" onclick="prevStep(3)">Back</button>
+                <button type="button" class="btn btn-next" onclick="nextStep(3)">Next</button>
+            </div>
+        </div>
+
+        <!-- PAGE 4: Payment Details & Submit -->
+        <div class="form-step" id="step-4">
+            <div class="payment-box">
+                <p>Pay your registration fee using GPay, PhonePe, or Paytm to this number:</p>
+                <div class="phone-number-badge">
+                    📞 8999849027
+                </div>
+                
+                <div class="form-group" style="text-align: left; margin-bottom: 0;">
+                    <label for="screenshot">Upload Payment Screenshot</label>
+                    <input type="file" id="screenshot" class="file-upload-input" accept="image/*" required>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="button" class="btn btn-back" id="backBtnFinal" onclick="prevStep(4)">Back</button>
+                <button type="submit" class="btn btn-submit" id="submitBtn">Submit</button>
+            </div>
+        </div>
+
+        <!-- Submission Status -->
         <div id="statusMsg" class="status-message"></div>
     </form>
 </div>
 
 <script>
+    let currentStep = 1;
+    const steps = document.querySelectorAll('.form-step');
+    const stepCircles = document.querySelectorAll('.step-circle');
+    const progressLineFill = document.getElementById('progressLineFill');
+
+    function updateProgressBar() {
+        stepCircles.forEach((circle, index) => {
+            if (index < currentStep) {
+                circle.classList.add('completed');
+                circle.classList.add('active');
+            } else if (index === currentStep - 1) {
+                circle.classList.add('active');
+                circle.classList.remove('completed');
+            } else {
+                circle.classList.remove('active', 'completed');
+            }
+        });
+        
+        // Progress bar percentage calculation
+        const progressPercentage = ((currentStep - 1) / (stepCircles.length - 1)) * 100;
+        progressLineFill.style.width = `${progressPercentage}%`;
+    }
+
+    function nextStep(stepNumber) {
+        // Simple client-side validation check before proceeding
+        if (stepNumber === 1 && !document.getElementById('teamName').value.trim()) {
+            alert("Please enter your Team Name first.");
+            return;
+        }
+        if (stepNumber === 2 && !document.getElementById('players').value.trim()) {
+            alert("Please list your player names/IGNs first.");
+            return;
+        }
+        if (stepNumber === 3 && !document.getElementById('whatsapp').value.trim()) {
+            alert("Please enter your WhatsApp number first.");
+            return;
+        }
+
+        document.getElementById(`step-${stepNumber}`).classList.remove('active');
+        currentStep++;
+        document.getElementById(`step-${currentStep}`).classList.add('active');
+        updateProgressBar();
+    }
+
+    function prevStep(stepNumber) {
+        document.getElementById(`step-${stepNumber}`).classList.remove('active');
+        currentStep--;
+        document.getElementById(`step-${currentStep}`).classList.add('active');
+        updateProgressBar();
+    }
+
+    // Handle form submit
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
         const submitBtn = document.getElementById('submitBtn');
+        const backBtnFinal = document.getElementById('backBtnFinal');
         const statusMsg = document.getElementById('statusMsg');
         
         const teamName = document.getElementById('teamName').value;
         const players = document.getElementById('players').value;
         const whatsapp = document.getElementById('whatsapp').value;
 
-        // Visual loading state
+        // Disable UI during transmission
         submitBtn.disabled = true;
+        backBtnFinal.disabled = true;
         submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // Trigger the Email notification through Formspree
-        sendEmailNotification(teamName, players, whatsapp, submitBtn, statusMsg);
+        // Call Formspree 
+        sendEmailNotification(teamName, players, whatsapp, submitBtn, backBtnFinal, statusMsg);
     });
 
-    // Send email notification using Formspree
-    function sendEmailNotification(teamName, players, whatsapp, submitBtn, statusMsg) {
+    function sendEmailNotification(teamName, players, whatsapp, submitBtn, backBtnFinal, statusMsg) {
         const targetEmail = "roshukadam2218@gmail.com";
         const formspreeUrl = `https://formspree.io/f/${targetEmail}`; 
 
@@ -264,13 +431,20 @@
         })
         .then(response => {
             submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Registration";
+            backBtnFinal.disabled = false;
+            submitBtn.innerText = "Submit";
             
             if (response.ok) {
                 statusMsg.className = "status-message status-success";
                 statusMsg.innerText = "Registration complete! Check your email for verification.";
                 statusMsg.style.display = "block";
                 document.getElementById('registrationForm').reset();
+                
+                // Go back to step 1
+                document.getElementById(`step-${currentStep}`).classList.remove('active');
+                currentStep = 1;
+                document.getElementById(`step-1`).classList.add('active');
+                updateProgressBar();
             } else {
                 statusMsg.className = "status-message status-error";
                 statusMsg.innerText = "Registration failed. Please try again.";
@@ -280,7 +454,8 @@
         .catch(error => {
             console.error("Error connecting to Formspree:", error);
             submitBtn.disabled = false;
-            submitBtn.innerText = "Submit Registration";
+            backBtnFinal.disabled = false;
+            submitBtn.innerText = "Submit";
             statusMsg.className = "status-message status-error";
             statusMsg.innerText = "Error sending request. Check your connection.";
             statusMsg.style.display = "block";
