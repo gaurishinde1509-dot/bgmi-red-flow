@@ -360,7 +360,7 @@
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = ""; 
 
-            const upiId = "yourname@okaxis"; // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR UPI ID
+            const upiId = "8999849027@ipb"; // ⚠️ REMEMBER TO REPLACE THIS WITH YOUR UPI ID
             const payeeName = "Tournament Playz";
             const amount = "100"; // Entry fee updated to 100 Rs
             const teamName = document.getElementById("team-name").value || "Team";
@@ -459,6 +459,32 @@ function sendEmailNotification(teamName, players, whatsapp) {
     const formspreeUrl = `https://formspree.io/f/${targetEmail}`; 
 
     const formData = {
+        subject: `🏆 New Team Registered: ${teamName}`,
+        _replyto: "no-reply@tournamentplayz.com",
+        "Team Name": teamName,
+        "Players": players,
+        "WhatsApp Link": whatsapp
+    };
+
+    fetch(formspreeUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log("Notification email successfully routed!");
+        } else {
+            console.error("Formspree route failed.");
+        }
+    })
+    .catch(error => {
+        console.error("Error connecting to Formspree:", error);
+    });
+}
         subject: `🏆 New Team Registered: ${teamName}`,
         _replyto: "no-reply@tournamentplayz.com",
         "Team Name": teamName,
