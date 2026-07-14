@@ -42,6 +42,23 @@
             border: 1px solid var(--border-color);
         }
 
+        /* Slot Counter Styling */
+        .slot-counter {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            background-color: var(--input-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+
         /* Progress Bar */
         .progress-container {
             display: flex;
@@ -103,7 +120,7 @@
 
         h2 {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
             color: var(--primary-color);
             font-size: 24px;
             text-transform: uppercase;
@@ -111,7 +128,6 @@
             font-weight: 800;
         }
 
-        /* Form Steps (hidden by default) */
         .form-step {
             display: none;
         }
@@ -163,7 +179,6 @@
             min-height: 100px;
         }
 
-        /* Payment Step Styling */
         .payment-box {
             background-color: var(--input-bg);
             padding: 20px;
@@ -202,7 +217,6 @@
             cursor: pointer;
         }
 
-        /* Buttons Grid */
         .btn-group {
             display: flex;
             gap: 15px;
@@ -264,7 +278,11 @@
 <div class="container">
     <h2>Tournament Registration</h2>
 
-    <!-- Step Progress Indicator -->
+    <!-- Live Slots Remaining Badge -->
+    <div class="slot-counter">
+        Slots Remaining: <span id="slotCount" style="color: #4CAF50;">48</span> / <span id="totalSlots">50</span>
+    </div>
+
     <div class="progress-container">
         <div class="progress-line"></div>
         <div class="progress-line-fill" id="progressLineFill"></div>
@@ -275,7 +293,7 @@
     </div>
     
     <form id="registrationForm">
-        <!-- PAGE 1: Team Name -->
+        <!-- PAGE 1 -->
         <div class="form-step active" id="step-1">
             <div class="form-group">
                 <label for="teamName">Team Name</label>
@@ -286,7 +304,7 @@
             </div>
         </div>
 
-        <!-- PAGE 2: Player Names -->
+        <!-- PAGE 2 -->
         <div class="form-step" id="step-2">
             <div class="form-group">
                 <label for="players">Player Names / IGNs (comma-separated)</label>
@@ -298,7 +316,7 @@
             </div>
         </div>
 
-        <!-- PAGE 3: WhatsApp Number -->
+        <!-- PAGE 3 -->
         <div class="form-step" id="step-3">
             <div class="form-group">
                 <label for="whatsapp">WhatsApp Phone Number</label>
@@ -310,7 +328,7 @@
             </div>
         </div>
 
-        <!-- PAGE 4: Payment Details & Submit -->
+        <!-- PAGE 4 -->
         <div class="form-step" id="step-4">
             <div class="payment-box">
                 <p>Pay your registration fee using GPay, PhonePe, or Paytm to this number:</p>
@@ -330,7 +348,6 @@
             </div>
         </div>
 
-        <!-- Submission Status -->
         <div id="statusMsg" class="status-message"></div>
     </form>
 </div>
@@ -340,7 +357,6 @@
     const steps = document.querySelectorAll('.form-step');
     const stepCircles = document.querySelectorAll('.step-circle');
     const progressLineFill = document.getElementById('progressLineFill');
-    let base64ImageString = ""; // Stores converted image data
 
     function updateProgressBar() {
         stepCircles.forEach((circle, index) => {
@@ -386,26 +402,7 @@
         updateProgressBar();
     }
 
-    // Convert selected image to Base64 instantly
-    document.getElementById('screenshot').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
-            // Check file size (keep it small to prevent submission errors, ideally under 2MB)
-            if (file.size > 2 * 1024 * 1024) {
-                alert("The image is too large. Please select a smaller screenshot under 2MB.");
-                this.value = "";
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                base64ImageString = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Handle form submit via Web3Forms API 
+    // Discord Integration Submission
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -422,37 +419,63 @@
         submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // JSON payload bypasses file validation and handles the base64 cleanly!
+        // IMPORTANT: Replace this placeholder string with your Discord URL
+        const discordWebhookUrl = "YOUR_DISCORD_WEBHOOK_URL";
+
+        if (discordWebhookUrl === "YOUR_DISCORD_WEBHOOK_URL") {
+            alert("Developer Note: Paste your Discord Channel Webhook URL inside the script to capture this registration!");
+            submitBtn.disabled = false;
+            backBtnFinal.disabled = false;
+            submitBtn.innerText = "Submit";
+            return;
+        }
+
         const payload = {
-            access_key: "3588aa9b-cc49-485c-ad60-ebb0485e0182",
-            subject: `🏆 New Team Registered: ${teamName}`,
-            from_name: "Tournament Playz",
-            "Team Name": teamName,
-            "Players": players,
-            "WhatsApp Link": whatsapp,
-            "Payment Screenshot (Base64)": base64ImageString || "No Image Uploaded"
+            username: "Tournament Tracker Bot",
+            avatar_url: "https://i.imgur.com/4M24N3H.png",
+            embeds: [{
+                title: "🏆 New Tournament Registration!",
+                color: 4976720,
+                fields: [
+                    { name: "Team Name", value: teamName, inline: true },
+                    { name: "WhatsApp Contact", value: whatsapp, inline: true },
+                    { name: "Roster / Players", value: players, inline: false }
+                ],
+                footer: { text: "System Logging Engine" },
+                timestamp: new Date().toISOString()
+            }]
         };
 
-        fetch("https://api.web3forms.com/submit", {
+        const discordFormData = new FormData();
+        discordFormData.append("payload_json", JSON.stringify(payload));
+        
+        const rawFileInput = document.getElementById('screenshot').files[0];
+        if (rawFileInput) {
+            discordFormData.append("file", rawFileInput, "screenshot.png");
+        }
+
+        fetch(discordWebhookUrl, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify(payload)
+            body: discordFormData
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(response => {
             submitBtn.disabled = false;
             backBtnFinal.disabled = false;
             submitBtn.innerText = "Submit";
             
-            if (data.success) {
+            if (response.ok) {
                 statusMsg.className = "status-message status-success";
-                statusMsg.innerText = "Registration completed successfully!";
+                statusMsg.innerText = "Registration logged successfully!";
                 statusMsg.style.display = "block";
+                
+                // --- Slot Counter Reduction Logic ---
+                let slotElement = document.getElementById('slotCount');
+                let currentSlots = parseInt(slotElement.innerText);
+                if (currentSlots > 0) {
+                    slotElement.innerText = currentSlots - 1;
+                }
+                
                 document.getElementById('registrationForm').reset();
-                base64ImageString = ""; // Reset image container
                 
                 // Return to Page 1 cleanly
                 document.getElementById(`step-${currentStep}`).classList.remove('active');
@@ -461,7 +484,7 @@
                 updateProgressBar();
             } else {
                 statusMsg.className = "status-message status-error";
-                statusMsg.innerText = "Registration failed: " + data.message;
+                statusMsg.innerText = "Error sending verification. Check server limits.";
                 statusMsg.style.display = "block";
             }
         })
@@ -471,7 +494,7 @@
             backBtnFinal.disabled = false;
             submitBtn.innerText = "Submit";
             statusMsg.className = "status-message status-error";
-            statusMsg.innerText = "Error sending details. Please try again.";
+            statusMsg.innerText = "Connection drop. Try resubmitting.";
             statusMsg.style.display = "block";
         });
     });
