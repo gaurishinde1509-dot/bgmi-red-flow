@@ -8,11 +8,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --primary-color: #7c3aed; /* Purple theme like your original site */
+            --primary-color: #7c3aed; /* Purple theme */
             --bg-color: #0f172a;
             --card-bg: #1e293b;
             --text-color: #f8fafc;
             --text-muted: #94a3b8;
+            --success-color: #10b981;
         }
 
         body {
@@ -33,17 +34,23 @@
             border-radius: 12px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 450px;
+            max-width: 500px;
             box-sizing: border-box;
+            transition: max-width 0.3s ease;
+        }
+
+        /* Expand container for Admin view */
+        .container.admin-mode {
+            max-width: 800px;
         }
 
         /* Step/Page Wrapper */
         .step {
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .step.active {
-            display: block; /* Show active page */
+            display: block;
         }
 
         h2 {
@@ -105,14 +112,12 @@
             background-color: #6d28d9;
         }
 
-        /* Payment QR center styling */
         .qr-container {
             display: flex;
             justify-content: center;
             margin: 20px 0;
         }
 
-        /* Social Link Buttons */
         .social-btn {
             display: block;
             text-align: center;
@@ -129,22 +134,88 @@
         }
 
         .community-btn {
-            background-color: #25D366; /* WhatsApp Green */
+            background-color: #25D366;
+        }
+
+        /* Admin Dashboard Styles */
+        .admin-table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #475569;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--text-muted);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-pending { background-color: #eab308; color: #000; }
+        .badge-approved { background-color: var(--success-color); color: #fff; }
+
+        .admin-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+
+        .approve-btn { background-color: var(--success-color); }
+        .delete-btn { background-color: #ef4444; }
+
+        .admin-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .admin-link {
+            font-size: 12px;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            margin-top: 15px;
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container" id="main-container">
 
         <!-- ================= PAGE 1: LOGIN ================= -->
         <div id="step-1" class="step active">
-            <h2>Welcome to Playz</h2>
+            <h2>Welcome to Tournament Playz</h2>
             <p class="subtitle">Please enter your login details to continue</p>
-            <form onsubmit="nextStep(event, 2)">
+            <form onsubmit="handleLogin(event)">
                 <div class="form-group">
                     <label>Email / Phone Number</label>
-                    <input type="text" id="login-id" placeholder="Enter email or phone" required>
+                    <input type="text" id="login-id" placeholder="Enter email or phone or 'admin'" required>
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -152,9 +223,10 @@
                 </div>
                 <button type="submit">Login</button>
             </form>
+            <div class="admin-link" onclick="promptAdminLogin()">💡 Access Admin Panel</div>
         </div>
 
-        <!-- ================= PAGE 2: TEAM & PLAYERS DETAIL ================= -->
+        <!-- ================= PAGE 2: SQUAD DETAILS ================= -->
         <div id="step-2" class="step">
             <h2>Squad Registration</h2>
             <p class="subtitle">Fill in your team details correctly</p>
@@ -189,15 +261,14 @@
                 GPay / PhonePe / Paytm / BHIM
             </p>
 
-            <button onclick="goToStep(4)">Done? Verify & Finish</button>
+            <button onclick="submitRegistrationData()">Done? Verify & Finish</button>
         </div>
 
-        <!-- ================= PAGE 4: SOCIALS & LINKS ================= -->
+        <!-- ================= PAGE 4: SUCCESS & SOCIALS ================= -->
         <div id="step-4" class="step">
             <h2>🎉 Registration Success!</h2>
-            <p class="subtitle">You have successfully registered. Join our groups now!</p>
+            <p class="subtitle">Your entry is submitted. It will show up after admin approval.</p>
             
-            <!-- Replace these '#' links with your actual URLs -->
             <a href="https://chat.whatsapp.com/your-community-link" target="_blank" class="social-btn community-btn">
                 💬 Join WhatsApp Community
             </a>
@@ -210,57 +281,168 @@
             </button>
         </div>
 
+        <!-- ================= PAGE 5: ADMIN DASHBOARD ================= -->
+        <div id="step-admin" class="step">
+            <div class="admin-nav">
+                <h2>🛠️ Admin Panel</h2>
+                <button onclick="logoutAdmin()" style="width: auto; margin-top: 0; padding: 6px 12px; background-color: #ef4444;">Logout</button>
+            </div>
+            <p class="subtitle">Manage registrations and check payment confirmations</p>
+            
+            <div class="admin-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Team Name</th>
+                            <th>Players</th>
+                            <th>WhatsApp</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                        <!-- Dynamic rows will go here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-    <!-- JavaScript to Handle Step Switching and UPI Generation -->
+    <!-- JavaScript Logic -->
     <script>
-        // Transition to next page
+        // Temporary database using browser storage
+        let registrations = JSON.parse(localStorage.getItem('tournament_teams')) || [];
+
+        // Simple Login Rule: regular credentials pass to step 2. 
+        // If they enter username 'admin' and pass 'admin123', goes to Admin Panel.
+        function handleLogin(event) {
+            event.preventDefault();
+            const id = document.getElementById("login-id").value;
+            const pass = document.getElementById("login-password").value;
+
+            if(id === "admin" && pass === "admin123") {
+                openAdminPanel();
+            } else {
+                goToStep(2);
+            }
+        }
+
+        function promptAdminLogin() {
+            document.getElementById("login-id").value = "admin";
+            document.getElementById("login-password").value = "";
+            document.getElementById("login-password").focus();
+        }
+
         function nextStep(event, nextStepNum) {
-            event.preventDefault(); // Stop form submission reloading
+            event.preventDefault();
             goToStep(nextStepNum);
 
-            // If moving to step 3 (Payment), generate the dynamic QR
             if (nextStepNum === 3) {
                 generatePaymentQR();
             }
         }
 
-        // Switch visible wrapper
         function goToStep(stepNum) {
-            // Hide all steps
-            document.querySelectorAll('.step').forEach(step => {
-                step.classList.remove('active');
-            });
-            // Show requested step
-            document.getElementById(`step-${stepNum}`).classList.add('active');
+            document.getElementById("main-container").classList.remove("admin-mode");
+            document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
+            
+            if(stepNum === 'admin') {
+                document.getElementById("main-container").classList.add("admin-mode");
+                document.getElementById("step-admin").classList.add('active');
+            } else {
+                document.getElementById(`step-${stepNum}`).classList.add('active');
+            }
         }
 
-        // Generate customized UPI QR Code
         function generatePaymentQR() {
             const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = ""; // Clear existing QR code if any
+            qrContainer.innerHTML = ""; 
 
-            const upiId = "yourname@okaxis";  // ⚠️ Change to your UPI ID
+            const upiId = "yourname@okaxis"; // ⚠️ Change this to your real UPI ID
             const payeeName = "Tournament Playz";
             const amount = "5000";
             const teamName = document.getElementById("team-name").value || "Team";
             const transactionNote = `Entry Fee for ${teamName}`;
 
-            // NPCI Official UPI Deep Link
             const upiLink = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(transactionNote)}`;
 
-            // Build QR code inside placeholder
             new QRCode(qrContainer, {
                 text: upiLink,
                 width: 200,
                 height: 200,
-                colorDark : "#ffffff", // Light QR code color on dark background
-                colorLight : "#1e293b", // Matching card-bg
+                colorDark : "#ffffff",
+                colorLight : "#1e293b",
                 correctLevel : QRCode.CorrectLevel.H
             });
         }
 
-        // Reset to Login (Page 1)
+        // Save submitted registration form data
+        function submitRegistrationData() {
+            const newTeam = {
+                id: Date.now(),
+                teamName: document.getElementById("team-name").value,
+                players: document.getElementById("players").value,
+                whatsapp: document.getElementById("whatsapp").value,
+                status: 'Pending'
+            };
+
+            registrations.push(newTeam);
+            localStorage.setItem('tournament_teams', JSON.stringify(registrations));
+            goToStep(4);
+        }
+
+        /* --- Admin Panel Logic --- */
+        function openAdminPanel() {
+            goToStep('admin');
+            renderAdminTable();
+        }
+
+        function renderAdminTable() {
+            const tbody = document.getElementById("admin-table-body");
+            tbody.innerHTML = "";
+
+            if(registrations.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No squads registered yet.</td></tr>`;
+                return;
+            }
+
+            registrations.forEach(team => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td><strong>${team.teamName}</strong></td>
+                    <td>${team.players}</td>
+                    <td>${team.whatsapp}</td>
+                    <td><span class="badge ${team.status === 'Approved' ? 'badge-approved' : 'badge-pending'}">${team.status}</span></td>
+                    <td class="admin-actions">
+                        ${team.status === 'Pending' ? `<button class="action-btn approve-btn" onclick="approveTeam(${team.id})">Approve</button>` : ''}
+                        <button class="action-btn delete-btn" onclick="deleteTeam(${team.id})">Remove</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function approveTeam(id) {
+            registrations = registrations.map(team => team.id === id ? {...team, status: 'Approved'} : team);
+            localStorage.setItem('tournament_teams', JSON.stringify(registrations));
+            renderAdminTable();
+        }
+
+        function deleteTeam(id) {
+            if(confirm("Are you sure you want to remove this registration?")) {
+                registrations = registrations.filter(team => team.id !== id);
+                localStorage.setItem('tournament_teams', JSON.stringify(registrations));
+                renderAdminTable();
+            }
+        }
+
+        function logoutAdmin() {
+            goToStep(1);
+            document.getElementById("login-id").value = "";
+            document.getElementById("login-password").value = "";
+        }
+
         function restartRegistration() {
             document.getElementById("login-id").value = "";
             document.getElementById("login-password").value = "";
